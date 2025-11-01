@@ -64,4 +64,22 @@ public class MensajeController {
 			response.getWriter().println("Mensaje no encontrado");
 		}
 	}
+	
+	// Enviar un mensaje
+    @PostMapping("/enviar")
+    public Mensaje enviarMensaje(@RequestBody int idRemitente, @RequestBody int idDestinatario, @RequestBody String asunto, @RequestBody String cuerpo) {
+        return mensajeService.enviarMensaje(idRemitente, idDestinatario, asunto, cuerpo);
+    }
+
+    // Ver los mensajes enviados
+    @GetMapping("/enviados/{actorId}")
+    public List<Mensaje> obtenerMensajesEnviados(@PathVariable int id) {
+        return mensajeService.obtenerMensajesEnviados(id);
+    }
+
+    // Ver los mensajes recibidos
+    @GetMapping("/recibidos/{actorId}")
+    public List<Mensaje> obtenerMensajesRecibidos(@PathVariable int id) {
+        return mensajeService.obtenerMensajesRecibidos(id);
+    }
 }

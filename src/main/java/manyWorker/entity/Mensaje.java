@@ -1,28 +1,28 @@
 package manyWorker.entity;
 
-import java.sql.Date;
+import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Mensaje extends DomainEntity {
 
-	@NotBlank
+	@NotNull
 	@ManyToOne
 	private Actor remitente;
 	
-	@NotBlank
+	@NotNull
 	@ManyToOne
 	private Actor destinatario;
 	
-	@NotBlank
-	private Date fechaEnvío;
+	@NotNull
+	private Date fechaEnvio;
 	
 	@NotBlank
 	private String asunto;
@@ -34,7 +34,7 @@ public class Mensaje extends DomainEntity {
 		super();
 		this.remitente = remitente;
 		this.destinatario = destinatario;
-		this.fechaEnvío = fechaEnvío;
+		this.fechaEnvio = fechaEnvío;
 		this.asunto = asunto;
 		this.cuerpo = cuerpo;
 	}
@@ -55,12 +55,12 @@ public class Mensaje extends DomainEntity {
 		this.destinatario = destinatario;
 	}
 
-	public Date getFechaEnvío() {
-		return fechaEnvío;
+	public Date getFechaEnvio() {
+		return fechaEnvio;
 	}
 
-	public void setFechaEnvío(Date fechaEnvío) {
-		this.fechaEnvío = fechaEnvío;
+	public void setFechaEnvio(Date fechaEnvío) {
+		this.fechaEnvio = fechaEnvío;
 	}
 
 	public String getAsunto() {
