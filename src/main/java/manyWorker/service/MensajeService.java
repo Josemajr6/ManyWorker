@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import manyWorker.entity.Mensaje;
 import manyWorker.repository.MensajeRepository;
 
+@Service
 public class MensajeService {
 
 	@Autowired

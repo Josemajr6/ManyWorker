@@ -5,6 +5,8 @@ import java.sql.Date;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -12,9 +14,11 @@ import jakarta.validation.constraints.NotBlank;
 public class Mensaje extends DomainEntity {
 
 	@NotBlank
+	@ManyToOne
 	private Actor remitente;
 	
 	@NotBlank
+	@ManyToOne
 	private Actor destinatario;
 	
 	@NotBlank
