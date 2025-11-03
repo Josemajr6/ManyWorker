@@ -33,12 +33,15 @@ public class CategoriaService {
         cat.setLeyesAplicables(datos.getLeyesAplicables());
         return categoriaRepo.save(cat);
     }
-
+    
     public void eliminar(String id) {
+    	// Verificamos si hay tareas asociadas a la categoría
         boolean tieneTareas = tareaRepo.existsByCategoria_Id(id);
         if (tieneTareas) {
+        	// Si existen, lanzamos una excepción para impedir la eliminación
             throw new IllegalStateException("No se puede eliminar una categoría asociada a tareas.");
         }
+        // Si no tiene tareas, se elimina con normalidad
         categoriaRepo.deleteById(id);
     }
 }
