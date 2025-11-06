@@ -4,11 +4,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
-public class Solicitud {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Genera de forma automáticamente el ID para identificar la solicitud
-    private Long id;
+public class Solicitud extends DomainEntity{
 
     private LocalDateTime fechaRegistro;
     
@@ -32,10 +28,6 @@ public class Solicitud {
     public Solicitud() {
         this.fechaRegistro = LocalDateTime.now();
         this.estado = EstadoSolicitud.PENDIENTE;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public LocalDateTime getFechaRegistro() {
