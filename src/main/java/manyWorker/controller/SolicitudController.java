@@ -38,7 +38,7 @@ public class SolicitudController {
             @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
-    public ResponseEntity<Solicitud> findById(@PathVariable Long id) {
+    public ResponseEntity<Solicitud> findById(@PathVariable int id) {
         Optional<Solicitud> solicitud = solicitudService.findById(id);
         return solicitud.map(ResponseEntity::ok)
                         .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -65,7 +65,7 @@ public class SolicitudController {
             @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
-    public ResponseEntity<String> aceptar(@PathVariable Long id) {
+    public ResponseEntity<String> aceptar(@PathVariable int id) {
         try {
             solicitudService.aceptar(id);
             return ResponseEntity.ok("Solicitud aceptada correctamente");
@@ -80,7 +80,7 @@ public class SolicitudController {
             @ApiResponse(responseCode = "200", description = "Solicitud rechazada correctamente"),
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
-    public ResponseEntity<String> rechazar(@PathVariable Long id) {
+    public ResponseEntity<String> rechazar(@PathVariable int id) {
         try {
             solicitudService.rechazar(id);
             return ResponseEntity.ok("Solicitud rechazada correctamente");
@@ -96,7 +96,7 @@ public class SolicitudController {
             @ApiResponse(responseCode = "400", description = "No se puede eliminar solicitud no pendiente"),
             @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
-    public ResponseEntity<String> eliminar(@PathVariable Long id) {
+    public ResponseEntity<String> eliminar(@PathVariable int id) {
         Optional<Solicitud> solicitud = solicitudService.findById(id);
         if (solicitud.isPresent()) {
             try {

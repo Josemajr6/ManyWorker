@@ -22,7 +22,7 @@ public class SolicitudService {
     }
 
     // Buscar solicitud por ID
-    public Optional<Solicitud> findById(Long id) {
+    public Optional<Solicitud> findById(int id) {
         return solicitudRepository.findById(id);
     }
 
@@ -44,7 +44,7 @@ public class SolicitudService {
     }
 
     // Aceptar solicitud
-    public Solicitud aceptar(Long id) {
+    public Solicitud aceptar(int id) {
         Solicitud solicitud = solicitudRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         solicitud.setEstado(Solicitud.EstadoSolicitud.ACEPTADO);
@@ -52,7 +52,7 @@ public class SolicitudService {
     }
 
     // Rechazar solicitud
-    public Solicitud rechazar(Long id) {
+    public Solicitud rechazar(int id) {
         Solicitud solicitud = solicitudRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         solicitud.setEstado(Solicitud.EstadoSolicitud.RECHAZADO);
@@ -60,7 +60,7 @@ public class SolicitudService {
     }
 
     // Eliminar solicitud (solo pendiente)
-    public void eliminar(Long id) {
+    public void eliminar(int id) {
         Solicitud solicitud = solicitudRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
 
