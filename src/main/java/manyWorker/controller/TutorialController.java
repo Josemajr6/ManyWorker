@@ -6,87 +6,85 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import manyWorker.entity.Tutorial;
 import manyWorker.service.TutorialService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 @RequestMapping("/tutoriales")
 @Tag(name = "Tutoriales", description = "Controlador para la gestión de tutoriales")
 public class TutorialController {
     
-    // Creamos una instancia de TutorialService para llamar a los métodos
     @Autowired
     private TutorialService tutorialService;
     
-
-    // Método para obtener todos los tutoriales
     @GetMapping
     @Operation(summary = "Obtener todos los tutoriales")
     public ResponseEntity<List<Tutorial>> findAll() {
-        List<Tutorial> tutoriales = tutorialService.findAll();
-        return ResponseEntity.ok(tutoriales);
+        return ResponseEntity.ok(tutorialService.findAll());
     }
 
-    // Método para buscar un tutorial por ID
     @GetMapping("/{id}")
     @Operation(summary = "Buscar un tutorial por ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Tutorial encontrado"),
+        @ApiResponse(responseCode = "404", description = "Tutorial no encontrado")
+    })
     public ResponseEntity<Tutorial> findById(@PathVariable int id) {
         Optional<Tutorial> oTutorial = tutorialService.findById(id);
-
-        if (oTutorial.isPresent()) {
-            return ResponseEntity.ok(oTutorial.get());
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        return oTutorial.map(ResponseEntity::ok)
+                       .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    // Método para guardar nuevos tutoriales
     @PostMapping
     @Operation(summary = "Crear un nuevo tutorial")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Tutorial creado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    })
     public ResponseEntity<String> save(@RequestBody Tutorial tutorial) {
-    	tutorialService.save(tutorial);
-    	return ResponseEntity.status(HttpStatus.OK).body("Tutorial creado correctamente");
+        Tutorial savedTutorial = tutorialService.save(tutorial);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Tutorial creado correctamente con ID: " + savedTutorial.getId());
     }
     
-    
-    // Método para actualizar un tutorial mediante ID
-    @Operation(summary = "Actualizar tutorial por ID")
     @PutMapping("/{id}")
-    public ResponseEntity<String> update (@PathVariable int id, @RequestBody Tutorial tutorial) {
-    	if (tutorialService.update(id, tutorial) == null) {
-    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutorial no encontrado");
-    	}
-    	else {
-    		return ResponseEntity.status(HttpStatus.OK).body("Tutorial actualizado correctamente");
-    	}
+    @Operation(summary = "Actualizar tutorial por ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Tutorial actualizado correctamente"),
+        @ApiResponse(responseCode = "404", description = "Tutorial no encontrado")
+    })
+    public ResponseEntity<String> update(@PathVariable int id, @RequestBody Tutorial tutorial) {
+        Tutorial updatedTutorial = tutorialService.update(id, tutorial);
+        if (updatedTutorial == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok("Tutorial actualizado correctamente");
     }
 
-    // Método para borrar tutoriales mediante ID
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar tutorial por ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Tutorial eliminado correctamente"),
+        @ApiResponse(responseCode = "404", description = "Tutorial no encontrado")
+    })
     public ResponseEntity<String> delete(@PathVariable int id) {
-    	Optional<Tutorial> oTutorial = tutorialService.findById(id);
-    	if (oTutorial.isPresent()) {
-    		tutorialService.delete(id);
-    		return ResponseEntity.status(HttpStatus.OK).body("Tutorial eliminado correctamente");
-    	}
-    	else {
-    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tutorial no encontrado");
-    	}
+        if (!tutorialService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        tutorialService.delete(id);
+        return ResponseEntity.ok("Tutorial eliminado correctamente");
     }
 
-
+    @GetMapping("/autor/{autorId}")
+    @Operation(summary = "Buscar tutoriales por ID de autor")
+    public ResponseEntity<List<Tutorial>> findByAutorId(@PathVariable int autorId) {
+        List<Tutorial> tutoriales = tutorialService.findByAutorId(autorId);
+        return ResponseEntity.ok(tutoriales);
+    }
 }
