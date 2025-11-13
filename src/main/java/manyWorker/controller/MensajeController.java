@@ -21,6 +21,13 @@ class EnviarMensajeRequest {
     public String cuerpo;
 }
 
+// DTO para la solicitud de broadcast
+class BroadcastRequest {
+	public int idRemitente;
+	public String asunto;
+	public String cuerpo;
+}
+
 @RestController
 @RequestMapping("/mensajes")
 public class MensajeController {
@@ -66,6 +73,18 @@ public class MensajeController {
             return ResponseEntity.ok("Mensaje eliminado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mensaje no encontrado");
+        }
+    }
+    
+    // Enviar mensaje broadcast (solo admin)
+    @PostMapping("/broadcast")
+    public ResponseEntity<?> enviarBroadcast(@RequestBody BroadcastRequest request) {
+        try {
+            List<Mensaje> enviados = mensajeService.enviarBroadcast(
+                    request.idRemitente, request.asunto, request.cuerpo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(enviados);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
 }

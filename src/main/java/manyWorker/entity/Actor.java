@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.URL;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -14,7 +15,7 @@ import jakarta.validation.constraints.Pattern;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Actor extends DomainEntity{
-
+	
 	@NotBlank
 	private String nombre;
 	
@@ -40,8 +41,8 @@ public class Actor extends DomainEntity{
 	
 	//Constructor
 	public Actor(@NotBlank String nombre, @NotBlank String apellido, String apellido2, @URL String foto,
-			@Pattern(regexp = "^\\w[@]\\w[.]\\w$") String correo, @Pattern(regexp = "^[6-9][0-9]{8}$") String telefono,
-			String direccion, @NotBlank List<PerfilSocial> numeroPerfiles) {
+			@Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$") String correo, @Pattern(regexp = "^[6-9][0-9]{8}$") String telefono,
+			String direccion, List<PerfilSocial> numeroPerfiles) {
 		super();
 		this.nombre = nombre;
 		this.apellido = apellido;
@@ -59,6 +60,7 @@ public class Actor extends DomainEntity{
 	}
 	
 	//Getter y setter
+	    
 	public String getNombre() {
 		return nombre;
 	}
