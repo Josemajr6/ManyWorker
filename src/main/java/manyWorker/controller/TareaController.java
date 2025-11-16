@@ -24,64 +24,123 @@ public class TareaController {
     private TareaService tareaService;
 
     @GetMapping
-    @Operation(summary = "Obtener todas las tareas")
+    @Operation(summary = "Obtener todas las tareas", description = "Devuelve una lista de todas las tareas del sistema")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de tareas obtenida correctamente")
+        @ApiResponse(responseCode = "200", description = "Lista de tareas obtenida correctamente"),
+        @ApiResponse(responseCode = "204", description = "No hay tareas registradas")
     })
-    public ResponseEntity<List<Tarea>> findAll() {
-        return ResponseEntity.ok(tareaService.findAll());
+    public ResponseEntity<?> findAll() {
+        List<Tarea> tareas = tareaService.findAll();
+        if (tareas.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay tareas registradas en el sistema");
+        }
+        return ResponseEntity.ok(tareas);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar tarea por ID")
+    @Operation(summary = "Buscar tarea por ID", description = "Busca una tarea específica utilizando su ID")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Tarea encontrada"),
-        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
+        @ApiResponse(responseCode = "400", description = "ID inválido")
     })
-    public ResponseEntity<Tarea> findById(@PathVariable String id) {
+    public ResponseEntity<?> findById(@PathVariable String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de tarea no puede estar vacío");
+        }
+        
         Optional<Tarea> oTarea = tareaService.findById(id);
         
-        if (oTarea.isPresent()) return ResponseEntity.ok(oTarea.get());
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        if (oTarea.isPresent()) {
+            return ResponseEntity.ok(oTarea.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea con ID '" + id + "' no encontrada");
+        }
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva tarea")
+    @Operation(summary = "Crear una nueva tarea", description = "Registra una nueva tarea en el sistema")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Tarea creada correctamente"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos")
+        @ApiResponse(responseCode = "400", description = "Datos de la tarea inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<String> save(@RequestBody Tarea tarea) {
-        Tarea savedTarea = tareaService.save(tarea);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Tarea creada correctamente con ID: " + savedTarea.getId());
+    public ResponseEntity<?> save(@RequestBody Tarea tarea) {
+        try {
+            if (tarea.getDescripcion() == null || tarea.getDescripcion().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La descripción de la tarea es obligatoria");
+            }
+            if (tarea.getCliente() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cliente de la tarea es obligatorio");
+            }
+            if (tarea.getCategoria() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La categoría de la tarea es obligatoria");
+            }
+            if (tarea.getPrecioMax() == null || tarea.getPrecioMax() <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El precio máximo debe ser mayor a 0");
+            }
+            
+            Tarea savedTarea = tareaService.save(tarea);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Tarea creada correctamente con ID: " + savedTarea.getId());
+                    
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al crear la tarea: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar una tarea")
+    @Operation(summary = "Actualizar una tarea", description = "Actualiza la información de una tarea existente")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Tarea actualizada correctamente"),
-        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<String> update(@PathVariable String id, @RequestBody Tarea tarea) {
-        Tarea updatedTarea = tareaService.update(id, tarea);
-        if (updatedTarea == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea no encontrada");
+    public ResponseEntity<?> update(@PathVariable String id, @RequestBody Tarea tarea) {
+        try {
+            if (id == null || id.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de tarea no puede estar vacío");
+            }
+            
+            Tarea updatedTarea = tareaService.update(id, tarea);
+            if (updatedTarea == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea con ID '" + id + "' no encontrada");
+            }
+            
+            return ResponseEntity.ok("Tarea actualizada correctamente");
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al actualizar la tarea: " + e.getMessage());
         }
-        return ResponseEntity.ok("Tarea actualizada correctamente");
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una tarea")
+    @Operation(summary = "Eliminar una tarea", description = "Elimina una tarea existente del sistema")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Tarea eliminada correctamente"),
-        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<String> delete(@PathVariable String id) {
-        if (!tareaService.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea no encontrada");
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        try {
+            if (id == null || id.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de tarea no puede estar vacío");
+            }
+            
+            if (!tareaService.existsById(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea con ID '" + id + "' no encontrada");
+            }
+            
+            tareaService.delete(id);
+            return ResponseEntity.ok("Tarea eliminada correctamente");
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar la tarea: " + e.getMessage());
         }
-        tareaService.delete(id);
-        return ResponseEntity.ok("Tarea eliminada correctamente");
     }
 }
