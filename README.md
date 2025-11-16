@@ -1,5 +1,5 @@
 ENLACES PARA TRELLO Y SWAGGER
-- trello: https://trello.com/b/7h0UBH6J/manyworker
+- Trello: https://trello.com/b/7h0UBH6J/manyworker
 - Swagger: http://localhost:8080/swagger-ui/index.html
 
 ENLACES PARA PRUEBAS DE POSTMAN
