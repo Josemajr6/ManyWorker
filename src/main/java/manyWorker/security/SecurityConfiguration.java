@@ -77,16 +77,24 @@ public class SecurityConfiguration {
             .requestMatchers("/solicitudes/**/valorar").hasAuthority("CLIENTES")
             
             // Rutas MENSAJE
-            .requestMatchers("/mensajes/**").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
-            .requestMatchers(HttpMethod.GET, "/mensajes/mensajes").hasAuthority("ADMINISTRADOR")
-            .requestMatchers(HttpMethod.POST, "/mensajes/broadcast").hasAuthority("ADMINISTRADOR")
-            .requestMatchers(HttpMethod.DELETE, "/mensajes/{id}").hasAuthority("ADMINISTRADOR")
+            .requestMatchers(HttpMethod.POST, "/mensajes/enviar").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.GET, "/mensajes/**").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.DELETE, "/mensajes/**").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.POST, "/mensajes/broadcast").hasAuthority("ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.GET, "/mensajes").hasAuthority("ADMINISTRADOR")
             
             // Rutas TUTORIALES
             .requestMatchers(HttpMethod.GET, "/tutoriales/**").permitAll() 
             .requestMatchers(HttpMethod.POST, "/tutoriales").hasAuthority("TRABAJADOR")
             .requestMatchers(HttpMethod.PUT, "/tutoriales/**").hasAuthority("TRABAJADOR")
             .requestMatchers(HttpMethod.DELETE, "/tutoriales/**").hasAnyAuthority("TRABAJADOR", "ADMINISTRADOR")
+            
+            // Rutas PERFIL SOCIAL
+            .requestMatchers(HttpMethod.POST, "/perfilSocial").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers(HttpMethod.PUT, "/perfilSocial/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers(HttpMethod.DELETE, "/perfilSocial/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers(HttpMethod.GET, "/perfilSocial").hasAuthority("ADMINISTRADOR")
+            .requestMatchers(HttpMethod.GET, "/perfilSocial/**").hasAuthority("ADMINISTRADOR")
             
             // Endpoints de Categoría
             .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
