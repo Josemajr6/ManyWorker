@@ -46,7 +46,7 @@ public class SecurityConfiguration {
 		            .requestMatchers(HttpMethod.GET, "/cliente", "/cliente/*").hasAuthority("ADMINISTRADOR")
 					.requestMatchers(HttpMethod.PUT, "/banear/**").hasAuthority("ADMINISTRADOR")
 					.requestMatchers(HttpMethod.PUT, "/desbanear/**").hasAuthority("ADMINISTRADOR")
-					.requestMatchers("/categorias/**").hasAuthority("ADMINISTRADOR")
+					//.requestMatchers("/categorias/**").hasAuthority("ADMINISTRADOR")
 					.requestMatchers("/mensajes/broadcast").hasAuthority("ADMINISTRADOR")
 
 					// Rutas TRABAJADOR
@@ -57,7 +57,7 @@ public class SecurityConfiguration {
 
 					// Rutas CLIENTE
 					.requestMatchers("/cliente/**").hasAuthority("CLIENTES")
-					.requestMatchers("/tareas/**").hasAuthority("CLIENTES")
+					//.requestMatchers("/tareas/**").hasAuthority("CLIENTES")
 					.requestMatchers("/solicitudes/**/aceptar").hasAuthority("CLIENTES")
 					.requestMatchers("/solicitudes/**/rechazar").hasAuthority("CLIENTES")
 					.requestMatchers(HttpMethod.PUT, "/cliente").hasAuthority("CLIENTES")

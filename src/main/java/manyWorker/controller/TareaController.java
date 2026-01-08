@@ -22,6 +22,9 @@ public class TareaController {
 
     @Autowired
     private TareaService tareaService;
+    
+    @Autowired
+    private manyWorker.security.JWTUtils jwtUtils;
 
     @GetMapping
     @Operation(summary = "Obtener todas las tareas", description = "Devuelve una lista de todas las tareas del sistema")
@@ -67,12 +70,14 @@ public class TareaController {
     })
     public ResponseEntity<?> save(@RequestBody Tarea tarea) {
         try {
+        	manyWorker.entity.Cliente clienteLogueado = jwtUtils.userLogin();
+        	if (clienteLogueado == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Debes ser un cliente para crear tareas.");
+            }
+        	tarea.setCliente(clienteLogueado);
             if (tarea.getDescripcion() == null || tarea.getDescripcion().trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La descripción de la tarea es obligatoria");
-            }
-            if (tarea.getCliente() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cliente de la tarea es obligatorio");
-            }
+            }            
             if (tarea.getCategoria() == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La categoría de la tarea es obligatoria");
             }
