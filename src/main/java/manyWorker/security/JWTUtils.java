@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import manyWorker.entity.Actor;
 import manyWorker.service.ActorService;
 import manyWorker.service.AdminService;
+import manyWorker.service.ClienteService;
+import manyWorker.service.TrabajadorService;
 
 @Component
 public class JWTUtils {
@@ -26,6 +28,14 @@ public class JWTUtils {
 	@Autowired
 	@Lazy
 	private AdminService adminService;
+	
+	@Autowired
+	@Lazy
+	private TrabajadorService trabajadorService;
+	
+	@Autowired
+	@Lazy
+	private ClienteService clienteService;
 
 	private static final String JWT_FIRMA = "ManyWorker";
 	private static final long EXTENCION_TOKEN = 86400;
@@ -74,6 +84,10 @@ public class JWTUtils {
 		switch (actor.getRol()) {
 		case ADMINISTRADOR:
 			return (T) adminService.findByUsername(username).orElse(null);
+		case TRABAJADOR: 
+            return (T) trabajadorService.findByUsername(username).orElse(null);
+		case CLIENTES: 
+            return (T) clienteService.findByUsername(username).orElse(null);
 		default:
 			return null;
 		}

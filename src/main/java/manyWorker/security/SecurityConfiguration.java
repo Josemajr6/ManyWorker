@@ -70,7 +70,15 @@ public class SecurityConfiguration {
 					
 					// Poned los endpoints de la tarea 8 aqui ordenados (cada uno los endpoint de las entity q hicisteis en la primera parte)
 					
+					// Endpoints de Categoría
+					// Permitir ver categorías a todo el mundo (público)
+					.requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
+					// Solo el ADMIN puede crear, editar o borrar categorías
+					.requestMatchers("/categorias/**").hasAuthority("ADMINISTRADOR")
 					
+					// Reglas para Tarea
+					// Tanto CLIENTES (quien crea la tarea) como TRABAJADOR (quien la realiza) deben tener acceso 
+					.requestMatchers("/tareas/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
 					
 					// Rutas SWAGGER
 		            .requestMatchers("/v3/api-docs/**").permitAll()

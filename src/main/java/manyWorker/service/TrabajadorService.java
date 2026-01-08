@@ -15,6 +15,10 @@ public class TrabajadorService {
 	@Autowired
 	private TrabajadorRepository trabajadorRepository;
 
+	public Optional<Trabajador> findByUsername(String username) {
+        return trabajadorRepository.findByUsername(username);
+    }
+	
 	public Optional<Trabajador> findById(int id) {
 		return this.trabajadorRepository.findById(id);
 	}

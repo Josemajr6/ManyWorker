@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import manyWorker.entity.Cliente;
+import manyWorker.entity.Trabajador;
 import manyWorker.repository.ClienteRepository;
 
 @Service
@@ -18,6 +19,10 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    public Optional<Cliente> findByUsername(String username) {
+        return clienteRepository.findByUsername(username);
+    }
+    
     public Optional<Cliente> findById(int id) {
         return this.clienteRepository.findById(id);
     }
