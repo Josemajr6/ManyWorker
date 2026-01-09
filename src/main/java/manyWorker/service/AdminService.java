@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import manyWorker.entity.Actor;
 import manyWorker.entity.Admin;
+import manyWorker.entity.Roles;
 import manyWorker.repository.AdminRepository;
 
 @Service
@@ -15,6 +17,9 @@ public class AdminService {
 
 	@Autowired
 	private AdminRepository adminRepository;
+	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
 
 	public Optional<Admin> findById(int id) {
 		return this.adminRepository.findById(id);
@@ -25,6 +30,12 @@ public class AdminService {
 	}
 
 	public Admin save(Admin admin) {
+		admin.setRol(Roles.ADMINISTRADOR);
+        
+        if (admin.getPassword() != null) {
+            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        }
+		
 		return this.adminRepository.save(admin);
 	}
 
