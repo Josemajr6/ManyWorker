@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -37,7 +37,17 @@ public class Actor extends DomainEntity{
 	
 	@OneToMany
 	private List<PerfilSocial> numeroPerfiles;
-
+	
+	@NotBlank
+	@Column(unique = true)
+	private String username;
+	
+	@NotBlank
+	private String password;
+	
+	private Roles rol;
+	
+	private boolean baneado;
 	
 	//Constructor
 	public Actor(@NotBlank String nombre, @NotBlank String apellido, String apellido2, @URL String foto,
@@ -123,5 +133,37 @@ public class Actor extends DomainEntity{
 
 	public void setNumeroPerfiles(List<PerfilSocial> numeroPerfiles) {
 		this.numeroPerfiles = numeroPerfiles;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Roles getRol() {
+		return rol;
+	}
+
+	public void setRol(Roles rol) {
+		this.rol = rol;
+	}
+
+	public boolean isBaneado() {
+		return baneado;
+	}
+
+	public void setBaneado(boolean baneado) {
+		this.baneado = baneado;
 	}
 }

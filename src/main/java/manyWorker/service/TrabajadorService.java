@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import manyWorker.entity.Roles;
 import manyWorker.entity.Trabajador;
 import manyWorker.repository.TrabajadorRepository;
 
@@ -15,6 +17,13 @@ public class TrabajadorService {
 	@Autowired
 	private TrabajadorRepository trabajadorRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	public Optional<Trabajador> findByUsername(String username) {
+        return trabajadorRepository.findByUsername(username);
+    }
+	
 	public Optional<Trabajador> findById(int id) {
 		return this.trabajadorRepository.findById(id);
 	}
@@ -24,6 +33,13 @@ public class TrabajadorService {
 	}
 
 	public Trabajador save(Trabajador trabajador) {
+		trabajador.setRol(Roles.TRABAJADOR);
+		
+		if (trabajador.getPassword() != null) {
+            String encodedPass = passwordEncoder.encode(trabajador.getPassword());
+            trabajador.setPassword(encodedPass);
+        }
+		
 		return this.trabajadorRepository.save(trabajador);
 	}
 

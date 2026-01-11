@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import manyWorker.entity.Cliente;
+import manyWorker.security.JWTUtils;
 import manyWorker.service.ClienteService;
 
 @RestController
@@ -23,12 +24,17 @@ public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
+    
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @GetMapping
     @Operation(summary = "Obtener todos los clientes", description = "Devuelve una lista de todos los clientes registrados en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay clientes registrados")
+        @ApiResponse(responseCode = "204", description = "No hay clientes registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Cliente> clientes = clienteService.findAll();
@@ -43,10 +49,18 @@ public class ClienteController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
         @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
-        if (id <= 0) {
+    	Cliente clienteLogueado = jwtUtils.userLogin();
+        
+        if (clienteLogueado == null || (clienteLogueado.getId() != id && !"ADMINISTRADOR".equals(clienteLogueado.getRol().name()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para ver este perfil");
+        }
+    	
+    	if (id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de cliente inválido");
         }
         
@@ -64,7 +78,9 @@ public class ClienteController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Cliente creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del cliente inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Cliente cliente) {
         try {
@@ -94,9 +110,17 @@ public class ClienteController {
         @ApiResponse(responseCode = "200", description = "Cliente actualizado correctamente"),
         @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody Cliente cliente) {
+    	Cliente clienteLogueado = jwtUtils.userLogin();
+        
+        if (clienteLogueado == null || clienteLogueado.getId() != id) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para actualizar este perfil");
+        }
+    	
         try {
             if (id <= 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de cliente inválido");
@@ -121,9 +145,17 @@ public class ClienteController {
         @ApiResponse(responseCode = "200", description = "Cliente eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
+    	Cliente clienteLogueado = jwtUtils.userLogin();
+        
+        if (clienteLogueado == null || clienteLogueado.getId() != id) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para eliminar este perfil");
+        }
+    	
         try {
             if (id <= 0) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de cliente inválido");
@@ -148,7 +180,9 @@ public class ClienteController {
         @ApiResponse(responseCode = "200", description = "Datos del cliente exportados correctamente"),
         @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> exportarDatos(@PathVariable int id) {
         try {

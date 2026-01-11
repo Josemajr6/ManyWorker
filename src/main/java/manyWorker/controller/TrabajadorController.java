@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import manyWorker.entity.Trabajador;
+import manyWorker.security.JWTUtils;
 import manyWorker.service.TrabajadorService;
 
 @RestController
@@ -22,12 +23,17 @@ public class TrabajadorController {
 
     @Autowired
     private TrabajadorService trabajadorService;
+    
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @GetMapping
     @Operation(summary = "Obtener todos los trabajadores", description = "Devuelve una lista completa de todos los trabajadores registrados en el sistema.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de trabajadores obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay trabajadores registrados")
+        @ApiResponse(responseCode = "204", description = "No hay trabajadores registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     
     // Devuelve un response entity de cualquier tipo
@@ -44,9 +50,17 @@ public class TrabajadorController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Trabajador encontrado"),
         @ApiResponse(responseCode = "404", description = "Trabajador no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
+    	Trabajador trabajadorLogueado = jwtUtils.userLogin();
+        
+        if (trabajadorLogueado == null || (trabajadorLogueado.getId() != id && !"ADMINISTRADOR".equals(trabajadorLogueado.getRol().name()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para ver este perfil");
+        }
+    	
         if (id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de trabajador inválido");
         }
@@ -65,7 +79,9 @@ public class TrabajadorController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Trabajador creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del trabajador inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Trabajador trabajador) {
         try {
@@ -92,7 +108,9 @@ public class TrabajadorController {
         @ApiResponse(responseCode = "200", description = "Trabajador actualizado correctamente"),
         @ApiResponse(responseCode = "404", description = "Trabajador no encontrado"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody Trabajador trabajador) {
         try {
@@ -119,7 +137,9 @@ public class TrabajadorController {
         @ApiResponse(responseCode = "200", description = "Trabajador eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Trabajador no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {

@@ -27,7 +27,9 @@ public class SolicitudController {
     @Operation(summary = "Obtener todas las solicitudes", description = "Devuelve una lista de todas las solicitudes del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay solicitudes registradas")
+        @ApiResponse(responseCode = "204", description = "No hay solicitudes registradas"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Solicitud> solicitudes = solicitudService.findAll();
@@ -42,7 +44,9 @@ public class SolicitudController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
         @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
         if (id <= 0) {
@@ -63,7 +67,9 @@ public class SolicitudController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Solicitud creada correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos de la solicitud inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> crear(@RequestBody Solicitud solicitud) {
         try {
@@ -98,7 +104,9 @@ public class SolicitudController {
         @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
         @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> aceptar(@PathVariable int id) {
         try {
@@ -123,7 +131,9 @@ public class SolicitudController {
         @ApiResponse(responseCode = "200", description = "Solicitud rechazada correctamente"),
         @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> rechazar(@PathVariable int id) {
         try {
@@ -148,7 +158,9 @@ public class SolicitudController {
         @ApiResponse(responseCode = "200", description = "Solicitud eliminada correctamente"),
         @ApiResponse(responseCode = "400", description = "No se puede eliminar solicitud no pendiente"),
         @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> eliminar(@PathVariable int id) {
         try {

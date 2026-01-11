@@ -27,7 +27,9 @@ public class TutorialController {
     @Operation(summary = "Obtener todos los tutoriales", description = "Devuelve una lista de todos los tutoriales del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de tutoriales obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay tutoriales registrados")
+        @ApiResponse(responseCode = "204", description = "No hay tutoriales registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Tutorial> tutoriales = tutorialService.findAll();
@@ -42,7 +44,9 @@ public class TutorialController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Tutorial encontrado"),
         @ApiResponse(responseCode = "404", description = "Tutorial no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
         if (id <= 0) {
@@ -63,7 +67,9 @@ public class TutorialController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Tutorial creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del tutorial inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Tutorial tutorial) {
         try {
@@ -93,7 +99,9 @@ public class TutorialController {
         @ApiResponse(responseCode = "200", description = "Tutorial actualizado correctamente"),
         @ApiResponse(responseCode = "404", description = "Tutorial no encontrado"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody Tutorial tutorial) {
         try {
@@ -120,7 +128,9 @@ public class TutorialController {
         @ApiResponse(responseCode = "200", description = "Tutorial eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Tutorial no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -146,7 +156,9 @@ public class TutorialController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de tutoriales obtenida correctamente"),
         @ApiResponse(responseCode = "204", description = "El autor no tiene tutoriales"),
-        @ApiResponse(responseCode = "400", description = "ID de autor inválido")
+        @ApiResponse(responseCode = "400", description = "ID de autor inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findByAutorId(@PathVariable int autorId) {
         if (autorId <= 0) {

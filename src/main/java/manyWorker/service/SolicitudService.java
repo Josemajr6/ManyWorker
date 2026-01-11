@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import manyWorker.entity.Solicitud;
 import manyWorker.entity.Tarea;
 import manyWorker.repository.SolicitudRepository;
+import manyWorker.repository.TareaRepository;
+import manyWorker.repository.TrabajadorRepository;
 
 @Service
 public class SolicitudService {
@@ -20,6 +22,11 @@ public class SolicitudService {
     @Autowired
     private MensajeService mensajeService;
 
+    @Autowired
+    private TareaRepository tareaRepository;
+    @Autowired
+    private TrabajadorRepository trabajadorRepository;
+    
     public List<Solicitud> findAll() {
         return solicitudRepository.findAll();
     }
@@ -38,7 +45,10 @@ public class SolicitudService {
 
     // Crear nueva solicitud
     public Solicitud crear(Solicitud solicitud) {
-        if (solicitud.getTrabajador() == null) {
+    	solicitud.setTrabajador(trabajadorRepository.findById(solicitud.getTrabajador().getId()).orElse(null));
+        solicitud.setTarea(tareaRepository.findById(solicitud.getTarea().getId()).orElse(null));
+    	
+    	if (solicitud.getTrabajador() == null) {
             throw new IllegalArgumentException("La solicitud debe tener un trabajador asignado");
         }
 
