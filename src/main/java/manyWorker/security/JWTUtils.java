@@ -86,7 +86,7 @@ public class JWTUtils {
 			return (T) adminService.findByUsername(username).orElse(null);
 		case TRABAJADOR: 
             return (T) trabajadorService.findByUsername(username).orElse(null);
-		case CLIENTES: 
+		case CLIENTE: 
             return (T) clienteService.findByUsername(username).orElse(null);
 		default:
 			return null;

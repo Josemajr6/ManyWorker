@@ -27,7 +27,9 @@ public class PerfilSocialController {
     @Operation(summary = "Obtener todos los perfiles sociales", description = "Devuelve una lista completa de todos los perfiles sociales registrados en el sistema.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de perfiles sociales obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay perfiles sociales registrados")
+        @ApiResponse(responseCode = "204", description = "No hay perfiles sociales registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<PerfilSocial> perfiles = perfilSocialService.findAll();
@@ -42,7 +44,9 @@ public class PerfilSocialController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Perfil social encontrado"),
         @ApiResponse(responseCode = "404", description = "Perfil social no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
         if (id <= 0) {
@@ -63,7 +67,9 @@ public class PerfilSocialController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Perfil social creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del perfil social inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody PerfilSocial perfilSocial) {
         try {
@@ -93,7 +99,9 @@ public class PerfilSocialController {
         @ApiResponse(responseCode = "200", description = "Perfil social actualizado correctamente"),
         @ApiResponse(responseCode = "404", description = "Perfil social no encontrado"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody PerfilSocial perfilSocial) {
         try {
@@ -120,7 +128,9 @@ public class PerfilSocialController {
         @ApiResponse(responseCode = "200", description = "Perfil social eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Perfil social no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {

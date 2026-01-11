@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import manyWorker.entity.Actor;
 import manyWorker.entity.Tarea;
 import manyWorker.service.TareaService;
 
@@ -30,7 +31,9 @@ public class TareaController {
     @Operation(summary = "Obtener todas las tareas", description = "Devuelve una lista de todas las tareas del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de tareas obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay tareas registradas")
+        @ApiResponse(responseCode = "204", description = "No hay tareas registradas"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Tarea> tareas = tareaService.findAll();
@@ -45,17 +48,39 @@ public class TareaController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Tarea encontrada"),
         @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable String id) {
-        if (id == null || id.trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de tarea no puede estar vacío");
+    	Actor usuarioLogueado = jwtUtils.userLogin();
+        
+        if (usuarioLogueado == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
         }
         
         Optional<Tarea> oTarea = tareaService.findById(id);
         
         if (oTarea.isPresent()) {
-            return ResponseEntity.ok(oTarea.get());
+            Tarea tarea = oTarea.get();
+            
+            boolean puedeVer = false;
+            
+            if ("ADMINISTRADOR".equals(usuarioLogueado.getRol().name())) {
+                puedeVer = true;
+            } else if ("CLIENTE".equals(usuarioLogueado.getRol().name())) {
+                if (tarea.getCliente() != null && tarea.getCliente().getId() == usuarioLogueado.getId()) {
+                    puedeVer = true;
+                }
+            } else if ("TRABAJADOR".equals(usuarioLogueado.getRol().name())) {
+                puedeVer = true;
+            }
+            
+            if (puedeVer) {
+                return ResponseEntity.ok(tarea);
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para ver esta tarea");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea con ID '" + id + "' no encontrada");
         }
@@ -66,7 +91,9 @@ public class TareaController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Tarea creada correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos de la tarea inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Tarea tarea) {
         try {
@@ -101,7 +128,9 @@ public class TareaController {
         @ApiResponse(responseCode = "200", description = "Tarea actualizada correctamente"),
         @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable String id, @RequestBody Tarea tarea) {
         try {
@@ -128,7 +157,9 @@ public class TareaController {
         @ApiResponse(responseCode = "200", description = "Tarea eliminada correctamente"),
         @ApiResponse(responseCode = "404", description = "Tarea no encontrada"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable String id) {
         try {

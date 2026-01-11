@@ -52,34 +52,34 @@ public class SecurityConfiguration {
             .requestMatchers(HttpMethod.DELETE, "/trabajador").hasAuthority("TRABAJADOR")
 
             // Rutas CLIENTE
-            .requestMatchers("/cliente/**").hasAuthority("CLIENTES")
-            .requestMatchers(HttpMethod.PUT, "/cliente").hasAuthority("CLIENTES")
-            .requestMatchers(HttpMethod.DELETE, "/cliente").hasAuthority("CLIENTES")
-            .requestMatchers("/cliente/miPerfil").hasAuthority("CLIENTES")
+            .requestMatchers("/cliente/**").hasAuthority("CLIENTE")
+            .requestMatchers(HttpMethod.PUT, "/cliente").hasAuthority("CLIENTE")
+            .requestMatchers(HttpMethod.DELETE, "/cliente").hasAuthority("CLIENTE")
+            .requestMatchers("/cliente/miPerfil").hasAuthority("CLIENTE")
 
             // Endpoints compartidos
-            .requestMatchers("/perfilSocial/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers("/perfilSocial/**").hasAnyAuthority("CLIENTE", "TRABAJADOR")
             
             // Endpoints Solocitud
-            .requestMatchers(HttpMethod.POST, "/solicitudes").hasAuthority("CLIENTES")
-            .requestMatchers(HttpMethod.GET, "/solicitudes").hasAnyAuthority("CLIENTES", "TRABAJADOR")
-            .requestMatchers(HttpMethod.GET, "/solicitudes/{id}").hasAnyAuthority("CLIENTES", "TRABAJADOR")
-            .requestMatchers(HttpMethod.PUT, "/solicitudes/{id}").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers(HttpMethod.POST, "/solicitudes").hasAuthority("CLIENTE")
+            .requestMatchers(HttpMethod.GET, "/solicitudes").hasAnyAuthority("CLIENTE", "TRABAJADOR")
+            .requestMatchers(HttpMethod.GET, "/solicitudes/{id}").hasAnyAuthority("CLIENTE", "TRABAJADOR")
+            .requestMatchers(HttpMethod.PUT, "/solicitudes/{id}").hasAnyAuthority("CLIENTE", "TRABAJADOR")
             .requestMatchers(HttpMethod.DELETE, "/solicitudes/{id}").hasAuthority("ADMINISTRADOR")
             .requestMatchers("/solicitudes/*/asignar").hasAuthority("TRABAJADOR")
             .requestMatchers("/solicitudes/*/finalizar").hasAuthority("TRABAJADOR")
             .requestMatchers("/solicitudes/*/comenzar").hasAuthority("TRABAJADOR")
             
             // Operaciones específicas de cliente
-            .requestMatchers("/solicitudes/*/aceptar").hasAuthority("CLIENTES")
-            .requestMatchers("/solicitudes/*/rechazar").hasAuthority("CLIENTES")
-            .requestMatchers("/solicitudes/*/cancelar").hasAuthority("CLIENTES")
-            .requestMatchers("/solicitudes/*/valorar").hasAuthority("CLIENTES")
+            .requestMatchers("/solicitudes/*/aceptar").hasAuthority("CLIENTE")
+            .requestMatchers("/solicitudes/*/rechazar").hasAuthority("CLIENTE")
+            .requestMatchers("/solicitudes/*/cancelar").hasAuthority("CLIENTE")
+            .requestMatchers("/solicitudes/*/valorar").hasAuthority("CLIENTE")
             
             // Rutas MENSAJE
-            .requestMatchers(HttpMethod.POST, "/mensajes/enviar").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
-	        .requestMatchers(HttpMethod.GET, "/mensajes/**").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
-	        .requestMatchers(HttpMethod.DELETE, "/mensajes/**").hasAnyAuthority("CLIENTES", "TRABAJADOR", "ADMINISTRADOR")
+            .requestMatchers(HttpMethod.POST, "/mensajes/enviar").hasAnyAuthority("CLIENTE", "TRABAJADOR", "ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.GET, "/mensajes/**").hasAnyAuthority("CLIENTE", "TRABAJADOR", "ADMINISTRADOR")
+	        .requestMatchers(HttpMethod.DELETE, "/mensajes/**").hasAnyAuthority("CLIENTE", "TRABAJADOR", "ADMINISTRADOR")
 	        .requestMatchers(HttpMethod.POST, "/mensajes/broadcast").hasAuthority("ADMINISTRADOR")
 	        .requestMatchers(HttpMethod.GET, "/mensajes").hasAuthority("ADMINISTRADOR")
             
@@ -90,9 +90,9 @@ public class SecurityConfiguration {
             .requestMatchers(HttpMethod.DELETE, "/tutoriales/**").hasAnyAuthority("TRABAJADOR", "ADMINISTRADOR")
             
             // Rutas PERFIL SOCIAL
-            .requestMatchers(HttpMethod.POST, "/perfilSocial").hasAnyAuthority("CLIENTES", "TRABAJADOR")
-            .requestMatchers(HttpMethod.PUT, "/perfilSocial/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
-            .requestMatchers(HttpMethod.DELETE, "/perfilSocial/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers(HttpMethod.POST, "/perfilSocial").hasAnyAuthority("CLIENTE", "TRABAJADOR")
+            .requestMatchers(HttpMethod.PUT, "/perfilSocial/**").hasAnyAuthority("CLIENTE", "TRABAJADOR")
+            .requestMatchers(HttpMethod.DELETE, "/perfilSocial/**").hasAnyAuthority("CLIENTE", "TRABAJADOR")
             .requestMatchers(HttpMethod.GET, "/perfilSocial").hasAuthority("ADMINISTRADOR")
             .requestMatchers(HttpMethod.GET, "/perfilSocial/**").hasAuthority("ADMINISTRADOR")
             
@@ -101,7 +101,7 @@ public class SecurityConfiguration {
             .requestMatchers("/categorias/**").hasAuthority("ADMINISTRADOR")
             
             // Reglas para Tarea
-            .requestMatchers("/tareas/**").hasAnyAuthority("CLIENTES", "TRABAJADOR")
+            .requestMatchers("/tareas/**").hasAnyAuthority("CLIENTE", "TRABAJADOR")
             
             // Rutas SWAGGER
             .requestMatchers("/v3/api-docs/**").permitAll()

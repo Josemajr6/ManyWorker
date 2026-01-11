@@ -40,7 +40,8 @@ public class ActorController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Autenticación exitosa, token JWT generado"),
         @ApiResponse(responseCode = "401", description = "Credenciales inválidas o usuario no encontrado"),
-        @ApiResponse(responseCode = "400", description = "Datos de login inválidos")
+        @ApiResponse(responseCode = "400", description = "Datos de login inválidos"),
+        @ApiResponse(responseCode = "403", description = "Usuario baneado"),
     })
     public ResponseEntity<?> login(@RequestBody ActorLogin actorLogin) {
         try {
@@ -87,7 +88,9 @@ public class ActorController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Registro exitoso"),
         @ApiResponse(responseCode = "400", description = "Datos de registro inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> registro(@RequestBody Actor nuevoActor) {
         try {
@@ -105,7 +108,8 @@ public class ActorController {
     @Operation(summary = "Obtener usuario actual", description = "Devuelve información del usuario actualmente autenticado")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Información del usuario obtenida"),
-        @ApiResponse(responseCode = "401", description = "No autenticado")
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "Usuario baneado"),
     })
     public ResponseEntity<?> obtenerUsuarioActual() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -126,7 +130,8 @@ public class ActorController {
     @Operation(summary = "Verificar token", description = "Verifica si el token JWT actual es válido")
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Token válido"),
-        @ApiResponse(responseCode = "401", description = "Token inválido o expirado")
+        @ApiResponse(responseCode = "401", description = "Token inválido o expirado"),
+        @ApiResponse(responseCode = "403", description = "Usuario baneado"),
     })
     public ResponseEntity<?> verificarToken() {
         try {

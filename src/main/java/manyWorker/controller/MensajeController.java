@@ -6,29 +6,31 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import manyWorker.entity.Actor;
 import manyWorker.entity.Mensaje;
+import manyWorker.repository.ActorRepository;
 import manyWorker.repository.MensajeRepository;
+import manyWorker.security.JWTUtils;
 import manyWorker.service.MensajeService;
 
-// DTO para enviar mensajes
+//DTO para enviar mensajes usando username
 class EnviarMensajeRequest {
-    public int idRemitente;
-    public int idDestinatario;
-    public String asunto;
-    public String cuerpo;
+	 public String usernameDestinatario;  // Usar username en lugar de ID
+	 public String asunto;
+	 public String cuerpo;
 }
 
-// DTO para broadcast
+//DTO para broadcast
 class BroadcastRequest {
-    public int idRemitente;
-    public String asunto;
-    public String cuerpo;
+	 public String asunto;
+	 public String cuerpo;
 }
 
 @RestController
@@ -41,12 +43,17 @@ public class MensajeController {
 
     @Autowired
     private MensajeRepository mensajeRepository;
+    
+    @Autowired
+    private ActorRepository actorRepository;
 
     @GetMapping
     @Operation(summary = "Obtener todos los mensajes", description = "Devuelve una lista de todos los mensajes del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de mensajes obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay mensajes registrados")
+        @ApiResponse(responseCode = "204", description = "No hay mensajes registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Mensaje> mensajes = mensajeService.findAll();
@@ -61,7 +68,9 @@ public class MensajeController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Mensaje encontrado"),
         @ApiResponse(responseCode = "404", description = "Mensaje no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
         if (id <= 0) {
@@ -83,16 +92,26 @@ public class MensajeController {
         @ApiResponse(responseCode = "201", description = "Mensaje enviado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del mensaje inválidos"),
         @ApiResponse(responseCode = "404", description = "Remitente o destinatario no encontrado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> enviarMensaje(@RequestBody EnviarMensajeRequest request) {
-        try {
-            if (request.idRemitente <= 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de remitente inválido");
+    	try {
+            Actor remitente = (Actor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            
+            if (remitente == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
             }
-            if (request.idDestinatario <= 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de destinatario inválido");
+            
+            Optional<Actor> oDestinatario = actorRepository.findByUsername(request.usernameDestinatario);
+            
+            if (!oDestinatario.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Destinatario no encontrado");
             }
+            
+            Actor destinatario = oDestinatario.get();
+            
             if (request.asunto == null || request.asunto.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El asunto del mensaje es obligatorio");
             }
@@ -100,15 +119,9 @@ public class MensajeController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo del mensaje es obligatorio");
             }
             
-            Mensaje nuevo = mensajeService.enviarMensaje(
-                    request.idRemitente, request.idDestinatario, request.asunto, request.cuerpo);
+            Mensaje nuevo = mensajeService.enviarMensaje(remitente.getId(), destinatario.getId(), request.asunto, request.cuerpo);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
             
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("no encontrado")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al enviar el mensaje: " + e.getMessage());
@@ -122,13 +135,18 @@ public class MensajeController {
         @ApiResponse(responseCode = "400", description = "Datos del mensaje inválidos"),
         @ApiResponse(responseCode = "403", description = "No autorizado para enviar broadcast"),
         @ApiResponse(responseCode = "404", description = "Remitente no encontrado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> enviarBroadcast(@RequestBody BroadcastRequest request) {
-        try {
-            if (request.idRemitente <= 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de remitente inválido");
+    	try {
+            Actor remitente = (Actor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            
+            if (remitente == null || !"ADMINISTRADOR".equals(remitente.getRol().name())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Solo administradores pueden enviar broadcast");
             }
+            
             if (request.asunto == null || request.asunto.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El asunto del mensaje es obligatorio");
             }
@@ -136,15 +154,9 @@ public class MensajeController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo del mensaje es obligatorio");
             }
             
-            List<Mensaje> enviados = mensajeService.enviarBroadcast(
-                    request.idRemitente, request.asunto, request.cuerpo);
+            List<Mensaje> enviados = mensajeService.enviarBroadcast(remitente.getId(), request.asunto, request.cuerpo);
             return ResponseEntity.status(HttpStatus.CREATED).body(enviados);
             
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("no encontrado")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al enviar broadcast: " + e.getMessage());
@@ -157,7 +169,9 @@ public class MensajeController {
         @ApiResponse(responseCode = "200", description = "Mensaje eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Mensaje no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -183,7 +197,9 @@ public class MensajeController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de mensajes obtenida correctamente"),
         @ApiResponse(responseCode = "204", description = "El remitente no tiene mensajes enviados"),
-        @ApiResponse(responseCode = "400", description = "ID de remitente inválido")
+        @ApiResponse(responseCode = "400", description = "ID de remitente inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findByRemitenteId(@PathVariable int remitenteId) {
         if (remitenteId <= 0) {
@@ -202,7 +218,9 @@ public class MensajeController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de mensajes obtenida correctamente"),
         @ApiResponse(responseCode = "204", description = "El destinatario no tiene mensajes recibidos"),
-        @ApiResponse(responseCode = "400", description = "ID de destinatario inválido")
+        @ApiResponse(responseCode = "400", description = "ID de destinatario inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findByDestinatarioId(@PathVariable int destinatarioId) {
         if (destinatarioId <= 0) {

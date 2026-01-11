@@ -37,7 +37,7 @@ public class ClienteService {
     }
 
     public Cliente save(Cliente cliente) {
-    	cliente.setRol(Roles.CLIENTES); 
+    	cliente.setRol(Roles.CLIENTE); 
         
         if (cliente.getPassword() != null) {
             String encodedPass = passwordEncoder.encode(cliente.getPassword());

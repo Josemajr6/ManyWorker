@@ -66,7 +66,7 @@ public class AdminService {
 	    return this.adminRepository.existsById(id);
 	}
 
-	public Optional<Actor> findByUsername(String username) {
+	public Optional<Admin> findByUsername(String username) {
 		return adminRepository.findByUsername(username);
 	}
 }

@@ -27,7 +27,9 @@ public class AdminController {
     @Operation(summary = "Obtener todos los administradores", description = "Devuelve una lista de todos los administradores del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de administradores obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay administradores registrados")
+        @ApiResponse(responseCode = "204", description = "No hay administradores registrados"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Admin> admins = adminService.findAll();
@@ -42,7 +44,9 @@ public class AdminController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Administrador encontrado"),
         @ApiResponse(responseCode = "404", description = "Administrador no encontrado"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
         if (id <= 0) {
@@ -63,7 +67,9 @@ public class AdminController {
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Administrador creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos del administrador inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Admin admin) {
         try {
@@ -93,7 +99,9 @@ public class AdminController {
         @ApiResponse(responseCode = "200", description = "Administrador actualizado correctamente"),
         @ApiResponse(responseCode = "404", description = "Administrador no encontrado"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody Admin admin) {
         try {
@@ -120,7 +128,9 @@ public class AdminController {
         @ApiResponse(responseCode = "200", description = "Administrador eliminado correctamente"),
         @ApiResponse(responseCode = "404", description = "Administrador no encontrado"),
         @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {

@@ -2,6 +2,6 @@ package manyWorker.entity;
 
 public enum Roles {
 	ADMINISTRADOR,
-	CLIENTES,
+	CLIENTE,
 	TRABAJADOR
 }

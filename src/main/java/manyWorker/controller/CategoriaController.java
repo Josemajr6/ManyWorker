@@ -27,7 +27,9 @@ public class CategoriaController {
     @Operation(summary = "Obtener todas las categorías", description = "Devuelve una lista de todas las categorías del sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de categorías obtenida correctamente"),
-        @ApiResponse(responseCode = "204", description = "No hay categorías registradas")
+        @ApiResponse(responseCode = "204", description = "No hay categorías registradas"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findAll() {
         List<Categoria> categorias = categoriaService.findAll();
@@ -42,7 +44,9 @@ public class CategoriaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Categoría encontrada"),
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada"),
-        @ApiResponse(responseCode = "400", description = "ID inválido")
+        @ApiResponse(responseCode = "400", description = "ID inválido"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> findById(@PathVariable String id) {
         if (id == null || id.trim().isEmpty()) {
@@ -63,7 +67,9 @@ public class CategoriaController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Categoría creada correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos de la categoría inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> save(@RequestBody Categoria categoria) {
         try {
@@ -87,7 +93,9 @@ public class CategoriaController {
         @ApiResponse(responseCode = "200", description = "Categoría actualizada correctamente"),
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> update(@PathVariable String id, @RequestBody Categoria datos) {
         try {
@@ -119,7 +127,9 @@ public class CategoriaController {
         @ApiResponse(responseCode = "200", description = "Categoría eliminada correctamente"),
         @ApiResponse(responseCode = "400", description = "No se puede eliminar (tiene tareas asociadas)"),
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
     })
     public ResponseEntity<?> delete(@PathVariable String id) {
         try {

@@ -11,6 +11,6 @@ import manyWorker.entity.Admin;
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Integer>{
 
-	Optional<Actor> findByUsername(String username);
+	Optional<Admin> findByUsername(String username);
 
 }
